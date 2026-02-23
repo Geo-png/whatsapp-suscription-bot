@@ -40,7 +40,6 @@ const client = new Client({
 const estados = {};
 
 const ORIGENES = [
-  "Jamamucito",
   "Barahona Honey",
   "Tropical Poetry",
   "Ocoa Lavado",
@@ -70,7 +69,7 @@ client.on('ready', async () => {
 
   try {
     // 🔥 PRUEBA INMEDIATA
-    await enviarMensajesASuscriptores("🧪 PRUEBA REAL");
+    await enviarMensajesASuscriptores("");
 
     // ⏰ CRON 10 y 25 a las 9AM RD
     cron.schedule(
@@ -121,7 +120,7 @@ A continuación presentamos los orígenes disponible para elegir.
 Responde el chat con el número del café que deseas.
 ${ORIGENES.map((o, i) => `${i + 1}. ${o}`).join('\n')}
 
-La recomendación del tostador para este  mes es: Ocoa Lavado!`
+La recomendación del tostador para este  mes es: Ocoa Lavado`
       );
 
       console.log(`📩 Mensaje enviado a ${user.nombre}`);
