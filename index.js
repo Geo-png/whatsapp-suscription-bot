@@ -114,13 +114,12 @@ async function enviarMensajesASuscriptores(prefijo = "") {
         user.telefono,
 `${prefijo ? prefijo + '\n\n' : ''}Hola ${user.nombre} ☕✨
 
-Ya estamos en día de suscripción.
+¡Bienvenid@ al nuevo formato de eleccion de suscripcion!
+A continuacion presentamos los origenes diponibles para elegir.
 
-Estos son los orígenes disponibles:
-
+Responde en el chat con el numero de cafe que deseas.
 ${ORIGENES.map((o, i) => `${i + 1}. ${o}`).join('\n')}
 
-Responde con el número del café que deseas.
 La recomendación del tostador para este  mes es: Ocoa Lavado!`
       );
 
