@@ -20,22 +20,21 @@ async function obtenerSuscriptores() {
   const rows = res.data.values || [];
 
   return rows
-    .filter(row => row[2] && row[2].toLowerCase() === 'si') // valida Activo
+    .filter(row => row[2] && row[2].toLowerCase() === 'si')
     .map(row => ({
       nombre: row[0],
       telefono: row[1] + '@c.us'
     }));
 }
 
-
-// 🔹 GUARDAR PEDIDO EN HOJA "Pedidos"
+// 🔹 GUARDAR PEDIDO
 async function guardarPedido(pedido) {
   const client = await auth.getClient();
   const sheets = google.sheets({ version: 'v4', auth: client });
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Pedidos!A:F',
+    range: 'Pedidos!A:G',
     valueInputOption: 'USER_ENTERED',
     requestBody: {
       values: [[
@@ -44,7 +43,8 @@ async function guardarPedido(pedido) {
         pedido.telefono,
         pedido.origen,
         pedido.peso,
-        pedido.molienda
+        pedido.molienda,
+        pedido.estado || 'Pendiente'
       ]]
     }
   });
