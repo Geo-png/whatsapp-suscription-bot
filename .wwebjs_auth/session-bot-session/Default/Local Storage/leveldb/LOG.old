@@ -1,0 +1,5 @@
+2026/03/11-15:18:12.716 5b98 Creating DB /workspaces/whatsapp-suscription-bot/.wwebjs_auth/session-bot-session/Default/Local Storage/leveldb since it was missing.
+2026/03/11-15:18:12.852 5b98 Reusing MANIFEST /workspaces/whatsapp-suscription-bot/.wwebjs_auth/session-bot-session/Default/Local Storage/leveldb/MANIFEST-000001
+2026/03/11-18:19:04.656 5b8f Level-0 table #5: started
+2026/03/11-18:19:04.777 5b8f Level-0 table #5: 19097 bytes OK
+2026/03/11-18:19:04.801 5b8f Delete type=0 #3

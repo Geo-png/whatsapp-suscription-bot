@@ -1,2 +1,3 @@
-2026/02/23-18:51:22.876 1aa10 Creating DB /workspaces/whatsapp-suscription-bot/.wwebjs_auth/session-bot-session/Default/Sync Data/LevelDB since it was missing.
-2026/02/23-18:51:23.004 1aa10 Reusing MANIFEST /workspaces/whatsapp-suscription-bot/.wwebjs_auth/session-bot-session/Default/Sync Data/LevelDB/MANIFEST-000001
+2026/03/16-15:07:53.606 44f9 Reusing MANIFEST /workspaces/whatsapp-suscription-bot/.wwebjs_auth/session-bot-session/Default/Sync Data/LevelDB/MANIFEST-000001
+2026/03/16-15:07:54.070 44f9 Recovering log #3
+2026/03/16-15:07:54.070 44f9 Reusing old log /workspaces/whatsapp-suscription-bot/.wwebjs_auth/session-bot-session/Default/Sync Data/LevelDB/000003.log 

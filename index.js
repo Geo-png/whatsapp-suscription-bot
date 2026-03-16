@@ -1,6 +1,7 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const cron = require('node-cron');
+const readline = require('readline');
 const { obtenerSuscriptores, guardarPedido } = require('./sheets');
 
 console.log("🚀 Iniciando bot...");
@@ -15,7 +16,7 @@ const client = new Client({
   }),
   puppeteer: {
     headless: true,
-    protocolTimeout: 180000, // 3 minutos para evitar timeout
+    protocolTimeout: 180000,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -40,14 +41,50 @@ const client = new Client({
 const estados = {};
 
 const ORIGENES = [
+  "Gajo de Toro",
   "Barahona Honey",
   "Tropical Poetry",
   "Ocoa Lavado",
   "Pico Duarte",
-  "Arroyo Bonito"
+  "Arroyo Bonito",
+  "Season´s Blend",
 ];
 
 const PESOS = ['8oz', '12oz', '16oz(1 libra)'];
+
+
+// =============================
+// COMANDOS DESDE CONSOLA
+// =============================
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+rl.on('line', (input) => {
+
+  if (input.trim().toLowerCase() === "estado") {
+
+    const activos = Object.values(estados);
+
+    if (!activos.length) {
+      console.log("\n📊 No hay pedidos en proceso.\n");
+      return;
+    }
+
+    console.log("\n📊 PEDIDOS EN PROCESO\n");
+
+    activos.forEach(e => {
+      console.log(
+        `${e.nombre} — paso: ${e.paso} — cafés: ${e.pedidos.length}`
+      );
+    });
+
+    console.log("");
+  }
+
+});
 
 
 // =============================
@@ -65,13 +102,15 @@ client.on('qr', qr => {
 // =============================
 
 client.on('ready', async () => {
+
   console.log('✅ Bot listo ☕');
 
   try {
-    // 🔥 PRUEBA INMEDIATA
-    await enviarMensajesASuscriptores("");
 
-    // ⏰ CRON 10 y 25 a las 9AM RD
+    console.log("📨 Enviando mensajes inmediatamente...");
+
+    await enviarMensajesASuscriptores("☕ Sistema de pedidos activado");
+
     cron.schedule(
       '0 9 10,25 * *',
       async () => {
@@ -84,6 +123,7 @@ client.on('ready', async () => {
   } catch (error) {
     console.error("Error en ready:", error);
   }
+
 });
 
 
@@ -92,13 +132,17 @@ client.on('ready', async () => {
 // =============================
 
 async function enviarMensajesASuscriptores(prefijo = "") {
+
   try {
+
     const suscriptores = await obtenerSuscriptores();
 
     if (!suscriptores.length) {
       console.log("⚠️ No hay suscriptores activos.");
       return;
     }
+
+    console.log(`📊 Suscriptores encontrados: ${suscriptores.length}`);
 
     for (const user of suscriptores) {
 
@@ -108,6 +152,8 @@ async function enviarMensajesASuscriptores(prefijo = "") {
         nombre: user.nombre,
         editando: null
       };
+
+      console.log(`🟡 ${user.nombre} inició proceso de pedido`);
 
       await client.sendMessage(
         user.telefono,
@@ -120,15 +166,17 @@ A continuación presentamos los orígenes disponible para elegir.
 Responde el chat con el número del café que deseas.
 ${ORIGENES.map((o, i) => `${i + 1}. ${o}`).join('\n')}
 
-La recomendación del tostador para este  mes es: Ocoa Lavado`
+La recomendación del tostador para este  mes es: Gajo de Toro`
       );
 
       console.log(`📩 Mensaje enviado a ${user.nombre}`);
+
     }
 
   } catch (error) {
     console.error("❌ Error enviando mensajes:", error);
   }
+
 }
 
 
@@ -147,9 +195,14 @@ client.on('message', async msg => {
 
     const estado = estados[telefono];
 
+    console.log(`💬 ${estado.nombre}: ${texto}`);
+
     if (estado.paso === 'origen') {
+
       const origen = ORIGENES[parseInt(texto) - 1];
       if (!origen) return msg.reply('Número inválido.');
+
+      console.log(`☕ ${estado.nombre} eligió origen: ${origen}`);
 
       estado.temp = { origen };
       estado.paso = 'peso';
@@ -158,11 +211,15 @@ client.on('message', async msg => {
 
 Pesos disponibles:
 ${PESOS.map((p, i) => `${i + 1}. ${p}`).join('\n')}`);
+
     }
 
     if (estado.paso === 'peso') {
+
       const peso = PESOS[parseInt(texto) - 1];
       if (!peso) return msg.reply('Número inválido.');
+
+      console.log(`⚖️ ${estado.nombre} eligió peso: ${peso}`);
 
       estado.temp.peso = peso;
       estado.paso = 'molienda';
@@ -171,15 +228,19 @@ ${PESOS.map((p, i) => `${i + 1}. ${p}`).join('\n')}`);
 
 1. Molido
 2. En granos`);
+
     }
 
     if (estado.paso === 'molienda') {
+
       const molienda =
         texto === '1' ? 'Molido' :
         texto === '2' ? 'En granos' :
         null;
 
       if (!molienda) return msg.reply('Número inválido.');
+
+      console.log(`🌀 ${estado.nombre} eligió molienda: ${molienda}`);
 
       estado.temp.molienda = molienda;
 
@@ -193,19 +254,27 @@ ${PESOS.map((p, i) => `${i + 1}. ${p}`).join('\n')}`);
       estado.temp = null;
       estado.paso = 'otro';
 
+      console.log(`📦 ${estado.nombre} agregó un café`);
+
       return msg.reply(`✅ Café guardado.
 
 1. Agregar otro café
 2. Ver resumen y confirmar`);
+
     }
 
     if (estado.paso === 'otro') {
 
       if (texto === '1') {
+
+        console.log(`➕ ${estado.nombre} agregará otro café`);
+
         estado.paso = 'origen';
+
         return msg.reply(`Selecciona otro origen:
 
 ${ORIGENES.map((o, i) => `${i + 1}. ${o}`).join('\n')}`);
+
       }
 
       if (texto === '2') {
@@ -222,13 +291,17 @@ ${ORIGENES.map((o, i) => `${i + 1}. ${o}`).join('\n')}`);
           )
           .join('\n');
 
+        console.log(`📋 ${estado.nombre} viendo resumen`);
+
         return msg.reply(`📋 *Resumen de tu pedido:*
 
 ${resumen}
 
 1. Confirmar pedido
 2. Editar un café`);
+
       }
+
     }
 
     if (estado.paso === 'confirmacion') {
@@ -236,13 +309,17 @@ ${resumen}
       if (texto === '1') {
 
         for (const p of estado.pedidos) {
+
           await guardarPedido({
             nombre: estado.nombre,
             telefono: telefono.replace('@c.us', ''),
             ...p,
             estado: "Confirmado"
           });
+
         }
+
+        console.log(`✅ ${estado.nombre} TERMINÓ su pedido`);
 
         await msg.reply(`🎉 Pedido confirmado.
 
@@ -250,9 +327,13 @@ Gracias ${estado.nombre} por ser parte de nuestra familia poética ☕`);
 
         delete estados[telefono];
         return;
+
       }
 
       if (texto === '2') {
+
+        console.log(`✏️ ${estado.nombre} editará su pedido`);
+
         const lista = estado.pedidos
           .map((p, i) =>
             `${i + 1}. ${p.origen} - ${p.peso} - ${p.molienda}`
@@ -266,13 +347,19 @@ Gracias ${estado.nombre} por ser parte de nuestra familia poética ☕`);
 ${lista}
 
 Responde con el número.`);
+
       }
+
     }
 
     if (estado.paso === 'editar') {
+
       const index = parseInt(texto) - 1;
+
       if (index < 0 || index >= estado.pedidos.length)
         return msg.reply('Número inválido.');
+
+      console.log(`🔧 ${estado.nombre} editará café ${index + 1}`);
 
       estado.editando = index;
       estado.paso = 'origen';
@@ -280,11 +367,13 @@ Responde con el número.`);
       return msg.reply(`Selecciona nuevo origen:
 
 ${ORIGENES.map((o, i) => `${i + 1}. ${o}`).join('\n')}`);
+
     }
 
   } catch (error) {
     console.error("❌ Error procesando mensaje:", error);
   }
+
 });
 
 

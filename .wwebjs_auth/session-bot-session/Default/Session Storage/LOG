@@ -1,2 +1,3 @@
-2026/02/23-18:51:23.227 1aa1a Creating DB /workspaces/whatsapp-suscription-bot/.wwebjs_auth/session-bot-session/Default/Session Storage since it was missing.
-2026/02/23-18:51:23.249 1aa1a Reusing MANIFEST /workspaces/whatsapp-suscription-bot/.wwebjs_auth/session-bot-session/Default/Session Storage/MANIFEST-000001
+2026/03/16-15:07:59.821 44f9 Reusing MANIFEST /workspaces/whatsapp-suscription-bot/.wwebjs_auth/session-bot-session/Default/Session Storage/MANIFEST-000001
+2026/03/16-15:07:59.822 44f9 Recovering log #3
+2026/03/16-15:07:59.822 44f9 Reusing old log /workspaces/whatsapp-suscription-bot/.wwebjs_auth/session-bot-session/Default/Session Storage/000003.log 
